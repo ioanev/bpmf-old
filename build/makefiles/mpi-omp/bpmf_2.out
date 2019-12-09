@@ -1,0 +1,180 @@
+mean rating: 4.13218
+total number of ratings in train: 818931
+total number of ratings in test: 204772
+average ratings per row: 141.806
+rows > break_point1: 44.1732
+rows > break_point2: 0.0692641
+num movs: 5775
+mean rating: 4.13218
+total number of ratings in train: 818931
+total number of ratings in test: 204772
+average ratings per row: 1.69376
+rows > break_point1: 0.0612203
+rows > break_point2: 0
+num users: 483500
+movs -- iter 0 -- 
+movs: comm cost 0%
+movs: nnz unbalance: 2%	(207545 <-> 204732 <-> 202562)
+movs: items unbalance: 34%	(1661 <-> 1443 <-> 1161)
+movs: work unbalance: 0%	(219199 <-> 219170 <-> 219155)
+
+movs: train nnz:	202562 / 818931
+movs: test nnz:	48884 / 818931
+movs: items:	1661 / 5775
+movs: work:	219172 / 876681
+movs -- iter 1 -- 
+movs: comm cost 0%
+movs: nnz unbalance: 2%	(207822 <-> 204732 <-> 202354)
+movs: items unbalance: 27%	(1619 <-> 1443 <-> 1217)
+movs: work unbalance: 0%	(223361 <-> 223357 <-> 223352)
+
+movs: train nnz:	202354 / 818931
+movs: test nnz:	47432 / 818931
+movs: items:	1619 / 5775
+movs: work:	223361 / 893429
+movs -- iter 2 -- 
+movs: comm cost 0%
+movs: nnz unbalance: 2%	(208052 <-> 204732 <-> 202176)
+movs: items unbalance: 22%	(1585 <-> 1443 <-> 1260)
+movs: work unbalance: 0%	(227548 <-> 227544 <-> 227538)
+
+movs: train nnz:	202176 / 818931
+movs: test nnz:	51633 / 818931
+movs: items:	1585 / 5775
+movs: work:	227538 / 910176
+movs domain:
+0: [0:1433[
+1: [1433:2693[
+2: [2693:4278[
+3: [4278:5775[
+
+users -- iter 0 -- 
+users: comm cost 18.7519%
+users: nnz unbalance: 2%	(207089 <-> 204732 <-> 201428)
+users: items unbalance: 0%	(121205 <-> 120875 <-> 120640)
+users: work unbalance: 0%	(1.41349e+06 <-> 1.41348e+06 <-> 1.41348e+06)
+
+users: train nnz:	201428 / 818931
+users: test nnz:	51727 / 818931
+users: items:	121205 / 483500
+users: work:	1.41348e+06 / 5.65393e+06
+users -- iter 1 -- 
+users: comm cost 18.7543%
+users: nnz unbalance: 2%	(207184 <-> 204732 <-> 201283)
+users: items unbalance: 0%	(121124 <-> 120875 <-> 120698)
+users: work unbalance: 0%	(1.76403e+06 <-> 1.76402e+06 <-> 1.76402e+06)
+
+users: train nnz:	201283 / 818931
+users: test nnz:	51755 / 818931
+users: items:	121124 / 483500
+users: work:	1.76402e+06 / 7.05608e+06
+users -- iter 2 -- 
+users: comm cost 18.7503%
+users: nnz unbalance: 2%	(207189 <-> 204732 <-> 201204)
+users: items unbalance: 0%	(121060 <-> 120875 <-> 120749)
+users: work unbalance: 0%	(2.11456e+06 <-> 2.11456e+06 <-> 2.11456e+06)
+
+users: train nnz:	201204 / 818931
+users: test nnz:	51811 / 818931
+users: items:	121060 / 483500
+users: work:	2.11456e+06 / 8.45823e+06
+users domain:
+0: [0:120749[
+1: [120749:241618[
+2: [241618:362678[
+3: [362678:483500[
+
+movs -- iter 0 -- 
+movs: comm cost 18.7576%
+movs: nnz unbalance: 6%	(213506 <-> 204732 <-> 199830)
+movs: items unbalance: 94%	(1923 <-> 1443 <-> 556)
+movs: work unbalance: 0%	(219459 <-> 219170 <-> 219060)
+
+movs: train nnz:	203879 / 818931
+movs: test nnz:	45213 / 818931
+movs: items:	1558 / 5775
+movs: work:	219459 / 876681
+movs -- iter 1 -- 
+movs: comm cost 18.7588%
+movs: nnz unbalance: 7%	(214243 <-> 204732 <-> 199543)
+movs: items unbalance: 74%	(1824 <-> 1443 <-> 750)
+movs: work unbalance: 0%	(223360 <-> 223357 <-> 223355)
+
+movs: train nnz:	203707 / 818931
+movs: test nnz:	38778 / 818931
+movs: items:	1513 / 5775
+movs: work:	223355 / 893429
+movs -- iter 2 -- 
+movs: comm cost 18.7584%
+movs: nnz unbalance: 7%	(214924 <-> 204732 <-> 199231)
+movs: items unbalance: 59%	(1744 <-> 1443 <-> 883)
+movs: work unbalance: 0%	(227549 <-> 227544 <-> 227537)
+
+movs: train nnz:	203552 / 818931
+movs: test nnz:	38992 / 818931
+movs: items:	1509 / 5775
+movs: work:	227548 / 910176
+movs domain:
+0: [0:1744[
+1: [1744:2627[
+2: [2627:4136[
+3: [4136:5775[
+
+users -- iter 0 -- 
+users: comm cost 18.747%
+users: nnz unbalance: 2%	(206201 <-> 204732 <-> 200961)
+users: items unbalance: 0%	(121252 <-> 120875 <-> 120728)
+users: work unbalance: 0%	(1.41349e+06 <-> 1.41348e+06 <-> 1.41348e+06)
+
+users: train nnz:	205712 / 818931
+users: test nnz:	50797 / 818931
+users: items:	120777 / 483500
+users: work:	1.41348e+06 / 5.65393e+06
+users -- iter 1 -- 
+users: comm cost 18.7515%
+users: nnz unbalance: 2%	(206211 <-> 204732 <-> 200866)
+users: items unbalance: 0%	(121152 <-> 120875 <-> 120770)
+users: work unbalance: 0%	(1.76402e+06 <-> 1.76402e+06 <-> 1.76402e+06)
+
+users: train nnz:	205746 / 818931
+users: test nnz:	50870 / 818931
+users: items:	120802 / 483500
+users: work:	1.76402e+06 / 7.05608e+06
+users -- iter 2 -- 
+users: comm cost 18.7502%
+users: nnz unbalance: 2%	(206196 <-> 204732 <-> 200872)
+users: items unbalance: 0%	(121071 <-> 120875 <-> 120796)
+users: work unbalance: 0%	(2.11456e+06 <-> 2.11456e+06 <-> 2.11455e+06)
+
+users: train nnz:	205670 / 818931
+users: test nnz:	50933 / 818931
+users: items:	120831 / 483500
+users: work:	2.11456e+06 / 8.45823e+06
+users domain:
+0: [0:120802[
+1: [120802:241598[
+2: [241598:362429[
+3: [362429:483500[
+
+hostname: johnpc-Lenovo-Z50-70
+pid: 5191
+2: Burnin iteration 0:	 RMSE: 2.6637	avg RMSE: 2.6637	FU(  3.99)	FM(  4.04)	items/sec: 211834.15	ratings/sec:   0.35M
+2: Burnin iteration 1:	 RMSE: 2.6637	avg RMSE: 2.6637	FU(  5.65)	FM(  5.69)	items/sec: 207958.51	ratings/sec:   0.35M
+2: Burnin iteration 2:	 RMSE: 2.6637	avg RMSE: 2.6637	FU(  6.92)	FM(  6.95)	items/sec: 212270.14	ratings/sec:   0.36M
+2: Burnin iteration 3:	 RMSE: 2.6637	avg RMSE: 2.6637	FU(  8.00)	FM(  8.01)	items/sec: 210015.73	ratings/sec:   0.35M
+2: Burnin iteration 4:	 RMSE: 2.6637	avg RMSE: 2.6637	FU(  8.95)	FM(  8.97)	items/sec: 215785.51	ratings/sec:   0.36M
+2: Sampling iteration 5:	 RMSE: 2.6637	avg RMSE: 2.6637	FU(  9.79)	FM(  9.83)	items/sec: 210596.45	ratings/sec:   0.35M
+2: Sampling iteration 6:	 RMSE: 2.6637	avg RMSE: 2.6637	FU( 10.58)	FM( 10.60)	items/sec: 212217.33	ratings/sec:   0.36M
+2: Sampling iteration 7:	 RMSE: 2.6637	avg RMSE: 2.6637	FU( 11.32)	FM( 11.33)	items/sec: 214937.89	ratings/sec:   0.36M
+2: Sampling iteration 8:	 RMSE: 2.6637	avg RMSE: 2.6637	FU( 12.02)	FM( 12.01)	items/sec: 214589.21	ratings/sec:   0.36M
+2: Sampling iteration 9:	 RMSE: 2.6637	avg RMSE: 2.6637	FU( 12.65)	FM( 12.65)	items/sec: 210001.10	ratings/sec:   0.35M
+
+Totals on 2:
+>> bcast:	     0.1554	(1%) in	20
+>> compute:	    20.5189	(89%) in	20
+>> eval:	     0.3262	(1%) in	10
+>> main:	    23.0800	(100%) in	10
+>> movies:	     1.2416	(5%) in	10
+>> process_queue:	    19.5813	(85%) in	6658
+>> users:	    21.5119	(93%) in	10
+>> waitall:	     2.0199	(9%) in	20

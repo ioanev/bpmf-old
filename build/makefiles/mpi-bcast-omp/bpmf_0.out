@@ -1,0 +1,179 @@
+mean rating: 4.13218
+total number of ratings in train: 818931
+total number of ratings in test: 204772
+average ratings per row: 141.806
+rows > break_point1: 44.1732
+rows > break_point2: 0.0692641
+num movs: 5775
+mean rating: 4.13218
+total number of ratings in train: 818931
+total number of ratings in test: 204772
+average ratings per row: 1.69376
+rows > break_point1: 0.0612203
+rows > break_point2: 0
+num users: 483500
+movs -- iter 0 -- 
+movs: comm cost 0%
+movs: nnz unbalance: 0%	(411109 <-> 409465 <-> 407822)
+movs: items unbalance: 11%	(3050 <-> 2887 <-> 2725)
+movs: work unbalance: 0%	(438359 <-> 438341 <-> 438322)
+
+movs: train nnz:	411109 / 818931
+movs: test nnz:	95762 / 818931
+movs: items:	2725 / 5775
+movs: work:	438359 / 876681
+movs -- iter 1 -- 
+movs: comm cost 0%
+movs: nnz unbalance: 0%	(411269 <-> 409465 <-> 407662)
+movs: items unbalance: 9%	(3020 <-> 2887 <-> 2755)
+movs: work unbalance: 0%	(446722 <-> 446714 <-> 446707)
+
+movs: train nnz:	411269 / 818931
+movs: test nnz:	93575 / 818931
+movs: items:	2755 / 5775
+movs: work:	446722 / 893429
+movs -- iter 2 -- 
+movs: comm cost 0%
+movs: nnz unbalance: 0%	(411433 <-> 409465 <-> 407498)
+movs: items unbalance: 7%	(2998 <-> 2887 <-> 2777)
+movs: work unbalance: 0%	(455095 <-> 455088 <-> 455081)
+
+movs: train nnz:	411433 / 818931
+movs: test nnz:	93575 / 818931
+movs: items:	2777 / 5775
+movs: work:	455095 / 910176
+movs domain:
+0: [0:2777[
+1: [2777:5775[
+
+users -- iter 0 -- 
+users: comm cost 25.0494%
+users: nnz unbalance: 1%	(413218 <-> 409465 <-> 405713)
+users: items unbalance: 0%	(242125 <-> 241750 <-> 241375)
+users: work unbalance: 0%	(2.82697e+06 <-> 2.82697e+06 <-> 2.82696e+06)
+
+users: train nnz:	413218 / 818931
+users: test nnz:	102050 / 818931
+users: items:	241375 / 483500
+users: work:	2.82697e+06 / 5.65393e+06
+users -- iter 1 -- 
+users: comm cost 25.0441%
+users: nnz unbalance: 1%	(413407 <-> 409465 <-> 405524)
+users: items unbalance: 0%	(242035 <-> 241750 <-> 241465)
+users: work unbalance: 0%	(3.52804e+06 <-> 3.52804e+06 <-> 3.52804e+06)
+
+users: train nnz:	413407 / 818931
+users: test nnz:	101936 / 818931
+users: items:	241465 / 483500
+users: work:	3.52804e+06 / 7.05608e+06
+users -- iter 2 -- 
+users: comm cost 25.0501%
+users: nnz unbalance: 1%	(413499 <-> 409465 <-> 405432)
+users: items unbalance: 0%	(241962 <-> 241750 <-> 241538)
+users: work unbalance: 0%	(4.22912e+06 <-> 4.22912e+06 <-> 4.22911e+06)
+
+users: train nnz:	413499 / 818931
+users: test nnz:	101944 / 818931
+users: items:	241538 / 483500
+users: work:	4.22911e+06 / 8.45823e+06
+users domain:
+0: [0:241538[
+1: [241538:483500[
+
+movs -- iter 0 -- 
+movs: comm cost 25.0671%
+movs: nnz unbalance: 1%	(412526 <-> 409465 <-> 406405)
+movs: items unbalance: 21%	(3195 <-> 2887 <-> 2580)
+movs: work unbalance: 0%	(438355 <-> 438341 <-> 438326)
+
+movs: train nnz:	412526 / 818931
+movs: test nnz:	97185 / 818931
+movs: items:	2580 / 5775
+movs: work:	438326 / 876681
+movs -- iter 1 -- 
+movs: comm cost 25.067%
+movs: nnz unbalance: 1%	(412832 <-> 409465 <-> 406099)
+movs: items unbalance: 17%	(3135 <-> 2887 <-> 2640)
+movs: work unbalance: 0%	(446715 <-> 446714 <-> 446714)
+
+movs: train nnz:	412832 / 818931
+movs: test nnz:	98186 / 818931
+movs: items:	2640 / 5775
+movs: work:	446714 / 893429
+movs -- iter 2 -- 
+movs: comm cost 25.0637%
+movs: nnz unbalance: 1%	(413053 <-> 409465 <-> 405878)
+movs: items unbalance: 13%	(3085 <-> 2887 <-> 2690)
+movs: work unbalance: 0%	(455091 <-> 455088 <-> 455085)
+
+movs: train nnz:	413053 / 818931
+movs: test nnz:	98186 / 818931
+movs: items:	2690 / 5775
+movs: work:	455091 / 910176
+movs domain:
+0: [0:2690[
+1: [2690:5775[
+
+users -- iter 0 -- 
+users: comm cost 25.0142%
+users: nnz unbalance: 0%	(409490 <-> 409465 <-> 409441)
+users: items unbalance: 0%	(241752 <-> 241750 <-> 241748)
+users: work unbalance: 0%	(2.82697e+06 <-> 2.82697e+06 <-> 2.82696e+06)
+
+users: train nnz:	409441 / 818931
+users: test nnz:	102765 / 818931
+users: items:	241752 / 483500
+users: work:	2.82696e+06 / 5.65393e+06
+users -- iter 1 -- 
+users: comm cost 25.0106%
+users: nnz unbalance: 0%	(409490 <-> 409465 <-> 409441)
+users: items unbalance: 0%	(241753 <-> 241750 <-> 241747)
+users: work unbalance: 0%	(3.52804e+06 <-> 3.52804e+06 <-> 3.52804e+06)
+
+users: train nnz:	409490 / 818931
+users: test nnz:	102717 / 818931
+users: items:	241747 / 483500
+users: work:	3.52804e+06 / 7.05608e+06
+users -- iter 2 -- 
+users: comm cost 25.0107%
+users: nnz unbalance: 0%	(409616 <-> 409465 <-> 409315)
+users: items unbalance: 0%	(241765 <-> 241750 <-> 241735)
+users: work unbalance: 0%	(4.22912e+06 <-> 4.22912e+06 <-> 4.22911e+06)
+
+users: train nnz:	409616 / 818931
+users: test nnz:	102777 / 818931
+users: items:	241735 / 483500
+users: work:	4.22911e+06 / 8.45823e+06
+users domain:
+0: [0:241735[
+1: [241735:483500[
+
+users: avg items to send per iter: 314589 / 483500: 0.650649
+users: messages from -> to proc
+	0	1
+0	0	147610
+1	166979	0
+movs: avg items to send per iter: 5385 / 5775: 0.932468
+movs: messages from -> to proc
+	0	1
+0	0	2485
+1	2900	0
+hostname: johnpc-Lenovo-Z50-70
+pid: 14250
+num_latent: 16
+nprocs: 2
+nthrds: 4
+nsims: 100
+burnin: 50
+grain_size: 1
+alpha: 2
+Total time: 0.0889585
+Final Avg RMSE: 0
+Average items/sec: -nan
+Average ratings/sec: -nan
+
+Totals on 0:
+>> communicate:	     0.0011	(1%) in	1
+>> compute:	     0.0838	(94%) in	1
+>> main:	     0.0890	(100%) in	1
+>> movies:	     0.0876	(98%) in	1
