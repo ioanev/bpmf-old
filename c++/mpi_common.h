@@ -35,7 +35,6 @@ void Sys::Abort(int err)
 }
 void MPI_Sys::alloc_and_init()
 {
-    /* movies : M x K (V matrix) | users : N x K (U matrix) */
     items_ptr = (double *)malloc(sizeof(double) * num_latent * num());
     sum_ptr = (double *)malloc(sizeof(double) * num_latent * MPI_Sys::nprocs);
     cov_ptr = (double *)malloc(sizeof(double) * num_latent * num_latent * MPI_Sys::nprocs);

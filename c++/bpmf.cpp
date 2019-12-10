@@ -25,7 +25,7 @@ using namespace Eigen;
 #ifdef BPMF_GPI_COMM
 #include "gaspi.h"
 #elif defined(BPMF_ARGO_COMM)
-#include "argo_nc.h"
+#include "argo_dsm.h"
 #elif defined(BPMF_MPI_PUT_COMM)
 #define BPMF_MPI_COMM
 #include "mpi_put.h"
@@ -40,6 +40,7 @@ using namespace Eigen;
 #else
 #error no comm include
 #endif
+
 
 void usage() 
 {
@@ -68,6 +69,7 @@ void usage()
                 << "  *.ddm: Dense binary double format\n"
                 << std::endl;
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -174,6 +176,25 @@ int main(int argc, char *argv[])
         users.assign(movies);
         movies.assign(users);
         users.assign(movies);
+
+        /*
+        #ifdef BPMF_ARGO_NO_COMM
+            std::size_t movies_chunk = movies.num() / Sys::nprocs;
+            std::size_t users_chunk = users.num() / Sys::nprocs;
+            std::size_t data_begin;
+
+            for (std::size_t i = 0; i < Sys::nprocs; ++i) {
+                data_begin = i * movies_chunk;
+                movies.dom[i] = data_begin;
+                
+                data_begin = i * users_chunk;
+                users.dom[i] = data_begin;
+            }
+            
+            movies.dom[Sys::nprocs] = movies.num();
+            users.dom[Sys::nprocs] = users.num();
+        #endif
+        */
 
         //std::cout << "(MOV) Process " << Sys::procid << " from " << movies.from() << " to " << movies.to() << std::endl;
         //std::cout << "(USR) Process " << Sys::procid << " from " << users.from() << " to " << users.to() << std::endl;

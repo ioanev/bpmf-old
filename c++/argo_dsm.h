@@ -7,10 +7,10 @@
 #include "argo.hpp"
 
 ///////////////////////////////////////
-#define NNODES 8
+#define NNODES 4
 
-#define BPMF_NUMOVIES 1050096UL
-#define BPMF_NUMUSERS 1107944UL
+#define BPMF_NUMOVIES 2100192UL
+#define BPMF_NUMUSERS 2215888UL
 ///////////////////////////////////////
 
 #define SYS ARGO_Sys
@@ -51,32 +51,34 @@ void Sys::Init(const unsigned long long& init_num_latent, const unsigned long lo
 
 void Sys::Init()
 {
-    std::size_t init_sum               =    sizeof(double) * BPMF_NUMLATENT * BPMF_NUMOVIES                  +  // items_ptr
-                                            sizeof(double) * BPMF_NUMLATENT * BPMF_NUMUSERS                  +  // >>
-                                            sizeof(double) * BPMF_NUMLATENT * NNODES                         +  // sum_ptr
-                                            sizeof(double) * BPMF_NUMLATENT * NNODES                         +  // >>
-                                            sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * NNODES        +  // cov_ptr
-                                            sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * NNODES        +  // >>
-                                            sizeof(double) * NNODES                                          +  // norm_ptr
-                                            sizeof(double) * NNODES;                                            // >>
+    std::size_t init_glmem               =    sizeof(double) * BPMF_NUMLATENT * BPMF_NUMOVIES                  +  // items_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMUSERS                  +  // >>
+                                              sizeof(double) * BPMF_NUMLATENT * NNODES                         +  // sum_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * NNODES                         +  // >>
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * NNODES        +  // cov_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * NNODES        +  // >>
+                                              sizeof(double) * NNODES                                          +  // norm_ptr
+                                              sizeof(double) * NNODES;                                            // >>
 
-    init_sum += (Sys::odirname.size()) ?    sizeof(double) * BPMF_NUMLATENT * BPMF_NUMOVIES                  +  // aggrMu_ptr
-                                            sizeof(double) * BPMF_NUMLATENT * BPMF_NUMUSERS                  +  // >>
-                                            sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * BPMF_NUMOVIES +  // aggrLambda_ptr
-                                            sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * BPMF_NUMUSERS    // >>
-                                       :    0;
+    init_glmem += (Sys::odirname.size()) ?    sizeof(double) * BPMF_NUMLATENT * BPMF_NUMOVIES                  +  // aggrMu_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMUSERS                  +  // >>
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * BPMF_NUMOVIES +  // aggrLambda_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * BPMF_NUMUSERS    // >>
+                                         :    0;
 
-    init_sum += (Sys::odirname.size()) ?    2 * 4 * 1024ULL
-                                       :    4 * 4 * 1024ULL;
+    init_glmem += (Sys::odirname.size()) ?     2 * 4 * 1024ULL
+                                         :    12 * 4 * 1024ULL;
 
-    assert(init_sum < 23622320128 * NNODES);
+    std::size_t init_cache = init_glmem;
+
+    assert(init_glmem < 23622320128 * NNODES);
     
-    argo::init(init_sum);
+    argo::init(init_glmem, init_cache);
 
     Sys::procid = argo::node_id();
     Sys::nprocs = argo::number_of_nodes();
 
-    std::cout << "Allocated size is : " << init_sum << ", process : " << Sys::procid << " out of " << Sys::nprocs << std::endl;
+    std::cout << "Allocated size is : " << init_glmem << ", process : " << Sys::procid << " out of " << Sys::nprocs << std::endl;
 }
 
 void Sys::Finalize()

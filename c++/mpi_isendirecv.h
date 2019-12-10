@@ -242,7 +242,7 @@ void MPI_Sys::process_queue()
             queue.pop_front();
             m.unlock();
 
-            // do some sends...
+            // do some sends
             for(int k = 0; k < Sys::nprocs; k++) {
                 if (!conn(i, k)) continue;
                 sb.at(k)->put(std::make_pair(i, items().col(i))); // here some mpi_isend()

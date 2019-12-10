@@ -174,8 +174,28 @@ void Sys::init()
     mean_rating = M.sum() / M.nonZeros();
     
     #ifdef BPMF_ARGO_COMM
+        std::size_t chunk = num() / Sys::nprocs;
+        std::size_t data_begin = Sys::procid * chunk;
+        std::size_t data_end = (Sys::procid != Sys::nprocs - 1) ? data_begin + chunk : num();
+
+        for (std::size_t i = 0; i < data_end; ++i)
+            items().col(i) = Eigen::MatrixXd::Zero(num_latent, 1);
+
+        chunk = (Sys::nprocs * num_latent) / Sys::nprocs;
+        data_begin = Sys::procid * chunk;
+        data_end = (Sys::procid != Sys::nprocs - 1) ? data_begin + chunk : Sys::nprocs * num_latent;
+
+        // std::cout << "Process " << Sys::procid << " from " << data_begin << " to " << data_end << std::endl;
+
+        for (std::size_t i = 0; i < data_end; ++i)
+            cov_map().col(i) = Eigen::MatrixXd::Zero(num_latent, 1);
+
+        sum_map().col(Sys::procid) = Eigen::MatrixXd::Zero(num_latent, 1);
+
+        norm_ptr[Sys::procid] = 0;
+
         /*
-        if (Sys::procid == 0) { // Array elements are default-initialzed. This may not be needed - Not Exprensive
+        if (Sys::procid == 0) { // Array elements are default-initialzed. Not needed - Not Exprensive
             items().setZero();
             sum_map().setZero();
             cov_map().setZero();
@@ -195,7 +215,7 @@ void Sys::init()
     {
         #ifdef BPMF_ARGO_COMM
             /*
-            if (Sys::procid == 0) { // Array elements are default-initialized. This may not be needed - Expensive
+            if (Sys::procid == 0) { // Array elements are default-initialized. Not needed - Expensive
                 aggrMus().setZero();
                 aggrLambdas().setZero();
             }
