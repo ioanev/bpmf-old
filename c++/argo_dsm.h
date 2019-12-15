@@ -73,7 +73,9 @@ void Sys::Abort(int err)
 
 struct ARGO_Sys : public Sys
 {
-    //-- c'tor
+    // #############################################################
+    // c'tor
+    // #############################################################
     ARGO_Sys(std::string name, std::string fname, std::string probename) : Sys(name, fname, probename) {}
     ARGO_Sys(std::string name, const SparseMatrixD &M, const SparseMatrixD &P) : Sys(name, M, P) {}
     
