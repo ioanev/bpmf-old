@@ -3,6 +3,7 @@
  * All rights reserved.
  */
 
+
 #ifndef BPMF_H
 #define BPMF_H
 
@@ -48,23 +49,29 @@ inline auto nrandn() -> decltype( VectorNd::NullaryExpr(std::ptr_fun(randn)) ) {
 
 inline double sqr(double x) { return x*x; }
 
-//
-// sampled hyper parameters for priors
-//
+// #################################################################
+// Sampled hyper parameters for priors
+// #################################################################
 struct HyperParams {
-    // fixed params
+    // #############################################################
+    // Fixed params
+    // #############################################################
     const int b0 = 2;
     const int df = num_latent;
     VectorNd mu0;
     MatrixNNd WI;
 
-    // sampling output
+    // #############################################################
+    // Sampling output
+    // #############################################################
     VectorNd mu;
     MatrixNNd LambdaF;
     MatrixNNd LambdaU; // triangulated upper part
     MatrixNNd LambdaL; // triangulated lower part
  
+    // #############################################################
     // c'tor
+    // #############################################################
     HyperParams()
     {
         WI.setIdentity();
@@ -81,12 +88,15 @@ struct HyperParams {
 
 struct Sys;
 
-// 
+// #################################################################
 // System represent all things related to the movies OR users
 // Hence a classic matrix factorization always has TWO Sys objects
 // for the two factors
+// #################################################################
 struct Sys {
-    //-- static info
+    // #############################################################
+    // Static info
+    // #############################################################
     static bool permute;
     static bool verbose;
     static int nprocs, procid;
@@ -95,7 +105,7 @@ struct Sys {
     static std::string odirname;
 
     static void Init();
-    static void Init(const unsigned long long&, const unsigned long long&, const unsigned long long&);
+    static void Init(const std::size_t&, const std::size_t&, const std::size_t&);
     static void Finalize();
     static void Abort(int);
     static void sync();
@@ -103,7 +113,9 @@ struct Sys {
     static std::ostream *os;
     static std::ostream &cout() { os->flush(); return *os; }
 
-    //-- c'tor
+    // #############################################################
+    // c'tor
+    // #############################################################
     std::string name;
     int iter;
     Sys(std::string name, std::string fname, std::string pname);
@@ -112,14 +124,18 @@ struct Sys {
     void init();
     virtual void alloc_and_init() = 0;
 
-    //-- sparse matrix
+    // #############################################################
+    // Sparse matrix
+    // #############################################################
     SparseMatrixD M; // known ratings
     double mean_rating;
     int num() const { return M.cols(); }
     int nnz() const { return M.nonZeros(); }
     int nnz(int i) const { return M.col(i).nonZeros(); }
 
-    // assignment and connectivity
+    // #############################################################
+    // Assignment and connectivity
+    // #############################################################
     typedef Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> PermMatrix;
     void permuteCols(const PermMatrix &, Sys &other); 
     void unpermuteCols(Sys &other); 
@@ -134,8 +150,11 @@ struct Sys {
         return proc;
     }
 
-    // assignment domain of users/movies to nodes
-    // assignment is continues: node i is assigned items from(i) until to(i)
+    // #############################################################
+    // Assignment domain of users/movies to nodes
+    // Assignment is continues: node i is assigned items from(i)
+    // until to(i)
+    // #############################################################
     int num(int i) const { return to(i) - from(i); } // number of items on node i
     int from(int i = procid) const { return dom.at(i); } 
     int to(int i = procid) const { return dom.at(i+1); }
@@ -144,7 +163,10 @@ struct Sys {
             os << i << ": [" << from(i) << ":" << to(i) << "[" << std::endl;
     }
 
-    // connectivity matrix tells what what items need to be sent to what nodes
+    // #############################################################
+    // Connectivity matrix tells what what items need to be sent to
+    // what nodes
+    // #############################################################
     void opt_conn(Sys& to);
     void update_conn(Sys& to);
     void build_conn(Sys& to);
@@ -158,33 +180,46 @@ struct Sys {
     unsigned send_count(int to) { return conn_count(Sys::procid, to); }
     unsigned recv_count(int from) { return conn_count(from, Sys::procid); }
 
-    //-- factors of the MF
+    // #############################################################
+    // Factors of the MF
+    // #############################################################
     double* items_ptr;
     MapNXd items() const { return MapNXd(items_ptr, num_latent, num()); }
     VectorNd sample(long idx, const MapNXd in);
 
-    //-- for propagated posterior
+    // #############################################################
+    // For propagated posterior
+    // #############################################################
     Eigen::MatrixXd propMu, propLambda;
     void add_prop_posterior(std::string);
     bool has_prop_posterior() const; 
 
-    //-- for aggregated posterior (argo implementation)
+    // #############################################################
+    // For aggregated posterior (ARGO implementation)
+    // #############################################################
     double* aggrMu_ptr;
     double* aggrLambda_ptr;
     MapNXd aggrMus() const { return MapNXd(aggrMu_ptr, num_latent, num()); }
     MapNNXd aggrLambdas() const { return MapNNXd(aggrLambda_ptr, num_latent * num_latent, num()); }
 
-    //-- for aggregated posterior (other implementations)
+    // #############################################################
+    // For aggregated posterior (other implementations)
+    // #############################################################
     Eigen::MatrixXd aggrMu, aggrLambda;
     void finalize_mu_lambda();
     
-    // virtual functions will be overriden based on COMM: NO_COMM, MPI, or GASPI
+    // #############################################################
+    // Virtual functions will be overriden based on COMM: NO_COMM,
+    // MPI, or GASPI
+    // #############################################################
     virtual void send_item(int i) = 0;
     void bcast();
     virtual void sample(Sys &in);
     static unsigned grain_size;
 
-    //-- covariance
+    // #############################################################
+    // Covariance
+    // #############################################################
     double *sum_ptr;
     MapNXd sum_map() const { return MapNXd(sum_ptr, num_latent, Sys::nprocs); }
     MapNXd::ColXpr sum(int i)  const { return sum_map().col(i); }
@@ -201,32 +236,40 @@ struct Sys {
         return ret;
     }
 
-    // norm
+    // #############################################################
+    // Norm
+    // #############################################################
     double *norm_ptr;
     MapXd norm_map() const { return MapXd(norm_ptr, Sys::nprocs); }
     double &norm(int i) const { return norm_ptr[i]; }
     double &local_norm() const { return norm(Sys::procid); }
     double aggr_norm() const { return norm_map().sum(); }
 
-    //-- hyper params
+    // #############################################################
+    // Hyper params
+    // #############################################################
     HyperParams hp;
     virtual void sample_hp() { hp.sample(num(), aggr_sum(), aggr_cov()); }
 
-    // output predictions
-    SparseMatrixD T, Torig; // test matrix (input)
-    SparseMatrixD Pavg, Pm2; // predictions for items in T (output)`
+    // #############################################################
+    // Output predictions
+    // #############################################################
+    SparseMatrixD T, Torig;     // test matrix (input)
+    SparseMatrixD Pavg, Pm2;    // predictions for items in T (output)`
     double rmse, rmse_avg;
     void predict(Sys& other, bool all = false);
     void print(double, double, double, double); 
 
-    // performance counting
+    // #############################################################
+    // Performance counting
+    // #############################################################
     std::vector<double> sample_time;
     void register_time(int i, double t);
 };
 
 
-
 const int breakpoint1 = 24; 
 const int breakpoint2 = 10500;
+
 
 #endif

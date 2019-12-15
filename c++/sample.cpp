@@ -3,6 +3,7 @@
  * All rights reserved.
  */
 
+
 #include "error.h"
 #include "bpmf.h"
 
@@ -36,7 +37,10 @@ unsigned Sys::grain_size;
 void calc_upper_part(MatrixNNd &m, VectorNd v);         // function for calcutation of an upper part of a symmetric matrix: m = v * v.transpose(); 
 void copy_lower_part(MatrixNNd &m);                     // function to copy an upper part of a symmetric matrix to a lower part
 
-// verifies that A has the same non-zero structure as B
+
+// #################################################################
+// Verifies that A has the same non-zero structure as B
+// #################################################################
 void assert_same_struct(SparseMatrixD &A, SparseMatrixD &B)
 {
     assert(A.cols() == B.cols());
@@ -44,17 +48,18 @@ void assert_same_struct(SparseMatrixD &A, SparseMatrixD &B)
     for(int i=0; i<A.cols(); ++i) assert(A.col(i).nonZeros() == B.col(i).nonZeros());
 }
 
-//
+
+// #################################################################
 // Does predictions for prediction matrix T
 // Computes RMSE (Root Means Square Error)
-//
+// #################################################################
 void Sys::predict(Sys& other, bool all)
 {
     int n = (iter < burnin) ? 0 : (iter - burnin);
    
-    double se(0.0); // squared err
+    double se(0.0);     // squared err
     double se_avg(0.0); // squared avg err
-    unsigned nump(0); // number of predictions
+    unsigned nump(0);   // number of predictions
 
     int lo = all ? 0 : from();
     int hi = all ? num() : to();
@@ -87,9 +92,10 @@ void Sys::predict(Sys& other, bool all)
     rmse_avg = sqrt( se_avg / nump );
 }
 
-//
+
+// #################################################################
 // Prints sampling progress
-//
+// #################################################################
 void Sys::print(double items_per_sec, double ratings_per_sec, double norm_u, double norm_m) {
   char buf[1024];
   std::string phase = (iter < Sys::burnin) ? "Burnin" : "Sampling";
@@ -98,9 +104,10 @@ void Sys::print(double items_per_sec, double ratings_per_sec, double norm_u, dou
   Sys::cout() << buf;
 }
 
-//
+
+// #################################################################
 // Constructor with that reads MTX files
-// 
+// #################################################################
 Sys::Sys(std::string name, std::string fname, std::string probename)
     : name(name), iter(-1), assigned(false), dom(nprocs+1)
 {
@@ -109,7 +116,6 @@ Sys::Sys(std::string name, std::string fname, std::string probename)
 
     auto rows = std::max(M.rows(), T.rows());
     auto cols = std::max(M.cols(), T.cols());
-
     M.conservativeResize(rows,cols);
     T.conservativeResize(rows,cols);
     Pm2 = Pavg = Torig = T; // reference ratings and predicted ratings
@@ -118,15 +124,17 @@ Sys::Sys(std::string name, std::string fname, std::string probename)
     assert(Sys::nprocs <= (int)Sys::max_procs);
 }
 
-//
+
+// #################################################################
 // Constructs Sys as transpose of existing Sys
-//
+// #################################################################
 Sys::Sys(std::string name, const SparseMatrixD &Mt, const SparseMatrixD &Pt) : name(name), iter(-1), assigned(false), dom(nprocs+1) {
     M = Mt.transpose();
     Pm2 = Pavg = T = Torig = Pt.transpose(); // reference ratings and predicted ratings
     assert(M.rows() == Pavg.rows());
     assert(M.cols() == Pavg.cols());
 }
+
 
 Sys::~Sys() 
 {
@@ -141,10 +149,12 @@ Sys::~Sys()
     }
 }
 
+
 bool Sys::has_prop_posterior() const
 {
     return propMu.nonZeros() > 0;
 }
+
 
 void Sys::add_prop_posterior(std::string fnames)
 {
@@ -164,16 +174,21 @@ void Sys::add_prop_posterior(std::string fnames)
     assert(propLambda.rows() == num_latent * num_latent);
 }
 
-//
-// Intializes internal Matrices and Vectors
-//
+
+// #################################################################
+// Initializes internal Matrices and Vectors
+// #################################################################
 void Sys::init()
 {
     //-- M
     assert(M.rows() > 0 && M.cols() > 0);
     mean_rating = M.sum() / M.nonZeros();
-    
+
     #ifdef BPMF_ARGO_COMM
+        /*
+        // #########################################################
+        // Each process initializes it's own chunk (by size) to 0
+        // #########################################################
         std::size_t chunk = num() / Sys::nprocs;
         std::size_t data_begin = Sys::procid * chunk;
         std::size_t data_end = (Sys::procid != Sys::nprocs - 1) ? data_begin + chunk : num();
@@ -193,8 +208,12 @@ void Sys::init()
         sum_map().col(Sys::procid) = Eigen::MatrixXd::Zero(num_latent, 1);
 
         norm_ptr[Sys::procid] = 0;
+        */
 
         /*
+        // #########################################################
+        // Process 0 initializes everything to 0
+        // #########################################################
         if (Sys::procid == 0) { // Array elements are default-initialzed. Not needed - Not Exprensive
             items().setZero();
             sum_map().setZero();
@@ -212,16 +231,19 @@ void Sys::init()
     col_permutation.setIdentity(num());
 
     if (Sys::odirname.size())
-    {
+    {   
+        /*
+        // #########################################################
+        // Process 0 initializes everything to 0
+        // #########################################################
         #ifdef BPMF_ARGO_COMM
-            /*
             if (Sys::procid == 0) { // Array elements are default-initialized. Not needed - Expensive
                 aggrMus().setZero();
                 aggrLambdas().setZero();
             }
-            */
         #endif
-        
+        */
+
         aggrMu = Eigen::MatrixXd::Zero(num_latent, num());
         aggrLambda = Eigen::MatrixXd::Zero(num_latent * num_latent, num());
     }
@@ -251,6 +273,7 @@ void Sys::init()
     if (measure_perf) sample_time.resize(num(), .0);
 }
 
+
 class PrecomputedLLT : public Eigen::LLT<MatrixNNd>
 {
   public:
@@ -258,10 +281,10 @@ class PrecomputedLLT : public Eigen::LLT<MatrixNNd>
 };
 
 
-//
+// #################################################################
 // Update ONE movie or one user
-//
-VectorNd Sys::sample(long idx, const MapNXd in) // Writing in own chunk, reading from others' chunks
+// #################################################################
+VectorNd Sys::sample(long idx, const MapNXd in)
 {
     auto start = tick();
 
@@ -280,15 +303,17 @@ VectorNd Sys::sample(long idx, const MapNXd in) // Writing in own chunk, reading
         hp_LambdaF = hp.LambdaF; 
         hp_LambdaL = hp.LambdaL; 
     }
-    
-    const int count = M.innerVector(idx).nonZeros(); // count of nonzeros elements in idx-th row of M matrix 
-                                                     // (how many movies watched idx-th user?).
 
-    VectorNd rr = hp_LambdaF * hp.mu;                 // vector num_latent x 1, we will use it in formula (14) from the paper
-    PrecomputedLLT chol;                             // matrix num_latent x num_latent, chol="lambda_i with *" from formula (14) 
+    const int count = M.innerVector(idx).nonZeros();    // count of nonzeros elements in idx-th row of M matrix 
+                                                        // (how many movies watched idx-th user?).
+
+    VectorNd rr = hp_LambdaF * hp.mu;                   // vector num_latent x 1, we will use it in formula (14) from the paper
+    PrecomputedLLT chol;                                // matrix num_latent x num_latent, chol="lambda_i with *" from formula (14) 
     
-    // if this user movie has less than 1K ratings,
+    // #############################################################
+    // If this user movie has less than 1K ratings,
     // we do a serial rank update
+    // #############################################################
     if( count < breakpoint1 ) {
 
         chol = hp_LambdaL;
@@ -296,13 +321,12 @@ VectorNd Sys::sample(long idx, const MapNXd in) // Writing in own chunk, reading
             auto col = in.col(it.row());
             chol.rankUpdate(col, alpha);
             rr.noalias() += col * ((it.value() - mean_rating) * alpha);
-
-            //if (Sys::procid == 0) // DEBUG
-                //std::cout << "< 1K : Reading from " << it.row() << std::endl;
         }
 
-    // else we do a serial full cholesky decomposition
+    // #############################################################
+    // Else we do a serial full cholesky decomposition
     // (not used if breakpoint1 == breakpoint2)
+    // #############################################################
     } else if (count < breakpoint2) {
 
         MatrixNNd MM(MatrixNNd::Zero());
@@ -313,24 +337,24 @@ VectorNd Sys::sample(long idx, const MapNXd in) // Writing in own chunk, reading
             calc_upper_part(MM, col);
             
             rr.noalias() += col * ((it.value() - mean_rating) * alpha);
-
-            //if (Sys::procid == 0) // DEBUG
-                //std::cout << "serial cholesky : Reading from " << it.row() << std::endl;
         }
 
-        // Here, we copy a triangular upper part to a triangular lower part, because the matrix is symmetric.
+        // #########################################################
+        // Here, we copy a triangular upper part to a triangular
+        // lower part, because the matrix is symmetric.
+        // #########################################################
         copy_lower_part(MM);
 
         chol.compute(hp_LambdaF + alpha * MM);
+    // #############################################################
     // for > 10K ratings, we have additional thread-level parallellism
+    // #############################################################
     } else {
-        //std::cout << "Came to thead cholesky!!!" << std::endl;
-
         const int task_size = count / 100;
 
-        auto from = M.outerIndexPtr()[idx];   // "from" belongs to [1..m], m - number of movies in M matrix 
-        auto to = M.outerIndexPtr()[idx+1];   // "to"   belongs to [1..m], m - number of movies in M matrix
-        MatrixNNd MM(MatrixNNd::Zero());               // matrix num_latent x num_latent 
+        auto from = M.outerIndexPtr()[idx];     // "from" belongs to [1..m], m - number of movies in M matrix 
+        auto to = M.outerIndexPtr()[idx+1];     // "to"   belongs to [1..m], m - number of movies in M matrix
+        MatrixNNd MM(MatrixNNd::Zero());        // matrix num_latent x num_latent 
  
         thread_vector<VectorNd> rrs(VectorNd::Zero());
         thread_vector<MatrixNNd> MMs(MatrixNNd::Zero());
@@ -339,29 +363,28 @@ VectorNd Sys::sample(long idx, const MapNXd in) // Writing in own chunk, reading
 #pragma omp task shared(rrs, MMs)
             for(int j = i; j<std::min(i+task_size, to); j++)
             {
-                                                           // for each nonzeros elemen in the i-th row of M matrix
-            auto val = M.valuePtr()[j];                // value of the j-th nonzeros element from idx-th row of M matrix
-            auto idx = M.innerIndexPtr()[j];           // index "j" of the element [i,j] from M matrix in compressed M matrix 
-            auto col = in.col(idx);                    // vector num_latent x 1 from V matrix: M[i,j] = U[i,:] x V[idx,:] 
+                                                // for each nonzeros elemen in the i-th row of M matrix
+            auto val = M.valuePtr()[j];         // value of the j-th nonzeros element from idx-th row of M matrix
+            auto idx = M.innerIndexPtr()[j];    // index "j" of the element [i,j] from M matrix in compressed M matrix 
+            auto col = in.col(idx);             // vector num_latent x 1 from V matrix: M[i,j] = U[i,:] x V[idx,:] 
 
-            //MM.noalias() += col * col.transpose();     // outer product
-                calc_upper_part(MMs.local(), col);
-                rrs.local().noalias() += col * ((val - mean_rating) * alpha); // vector num_latent x 1
-
-            //if (Sys::procid == 0) // DEBUG
-                //std::cout << "thread cholesky : Reading from " << idx << std::endl;
-        }
+            //MM.noalias() += col * col.transpose();                        // outer product
+            calc_upper_part(MMs.local(), col);
+            rrs.local().noalias() += col * ((val - mean_rating) * alpha);   // vector num_latent x 1
+            }
         }
 #pragma omp taskwait
 
-        // accumulate
+        // #########################################################
+        // Accumulate
+        // #########################################################
         MM += MMs.combine();
         rr += rrs.combine();
         copy_lower_part(MM);
 
-        chol.compute(hp_LambdaF + alpha * MM);         // matrix num_latent x num_latent
-                                                       // chol="lambda_i with *" from formula (14)
-                                                       // lambda_i with * = LambdaU + alpha * MM
+        chol.compute(hp_LambdaF + alpha * MM);  // matrix num_latent x num_latent
+                                                // chol="lambda_i with *" from formula (14)
+                                                // lambda_i with * = LambdaU + alpha * MM
     }
 
     if(chol.info() != Eigen::Success) THROWERROR("Cholesky failed");
@@ -377,10 +400,10 @@ VectorNd Sys::sample(long idx, const MapNXd in) // Writing in own chunk, reading
 
     // Expression u_i = U \ (s + (L \ rr)) in Matlab looks for Eigen library like: 
 
-    chol.matrixL().solveInPlace(rr);                    // L*Y=rr => Y=L\rr, we store Y result again in rr vector  
-    rr += nrandn();                                     // rr=s+(L\rr), we store result again in rr vector
-    chol.matrixU().solveInPlace(rr);                    // u_i=U\rr 
-    items().col(idx) = rr;                              // we save rr vector in items matrix (it is user features matrix)    
+    chol.matrixL().solveInPlace(rr);            // L*Y=rr => Y=L\rr, we store Y result again in rr vector  
+    rr += nrandn();                             // rr=s+(L\rr), we store result again in rr vector
+    chol.matrixU().solveInPlace(rr);            // u_i=U\rr 
+    items().col(idx) = rr;                      // we save rr vector in items matrix (it is user features matrix)
 
     auto stop = tick();
     register_time(idx, 1e6 * (stop - start));
@@ -391,15 +414,16 @@ VectorNd Sys::sample(long idx, const MapNXd in) // Writing in own chunk, reading
     return rr;
 }
 
-// 
-// update ALL movies / users in parallel
-//
+
+// #################################################################
+// Update ALL movies / users in parallel
+// #################################################################
 void Sys::sample(Sys &in) 
 {
     iter++;
-    thread_vector<VectorNd>  sums(VectorNd::Zero()); // sum
-    thread_vector<double>    norms(0.0); // squared norm
-    thread_vector<MatrixNNd> prods(MatrixNNd::Zero()); // outer prod
+    thread_vector<VectorNd>  sums(VectorNd::Zero());    // sum
+    thread_vector<double>    norms(0.0);                // squared norm
+    thread_vector<MatrixNNd> prods(MatrixNNd::Zero());  // outer prod
 
 #pragma omp parallel for schedule(guided)
     for (int i = from(); i < to(); ++i)
@@ -432,34 +456,42 @@ void Sys::sample(Sys &in)
     local_sum() = sum;
     local_cov() = (prod - (sum * sum.transpose() / N)) / (N-1);
     local_norm() = norm;
-
 }
+
 
 void Sys::register_time(int i, double t)
 {
     if (measure_perf) sample_time.at(i) += t;
 }
 
+
 void calc_upper_part(MatrixNNd &m, VectorNd v)
 {
-  // we use the formula: m = m + v * v.transpose(), but we calculate only an upper part of m matrix
-  for (int j=0; j<num_latent; j++)          // columns
-  {
-    for(int i=0; i<=j; i++)              // rows
+    // #############################################################
+    // We use the formula: m = m + v * v.transpose(), but we
+    // calculate only an upper part of m matrix
+    // #############################################################
+    for (int j=0; j<num_latent; j++)    // columns
     {
-      m(i,j) = m(i,j) + v[j] * v[i];
+        for(int i=0; i<=j; i++)         // rows
+        {
+            m(i,j) = m(i,j) + v[j] * v[i];
+        }
     }
-  }
 }
+
 
 void copy_lower_part(MatrixNNd &m)
 {
-  // Here, we copy a triangular upper part to a triangular lower part, because the matrix is symmetric.
-  for (int j=1; j<num_latent; j++)          // columns
-  {
-    for(int i=0; i<=j-1; i++)            // rows
+    // #############################################################
+    // Here, we copy a triangular upper part to a triangular lower
+    // part, because the matrix is symmetric.
+    // #############################################################
+    for (int j=1; j<num_latent; j++)    // columns
     {
-      m(j,i) = m(i,j);
+        for(int i=0; i<=j-1; i++)       // rows
+        {
+            m(j,i) = m(i,j);
+        }
     }
-  }
 }

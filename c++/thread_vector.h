@@ -19,10 +19,12 @@ inline void init(int n)
     if (n <= 0)
     {
         n = omp_get_max_threads();
+        std::cout << "Using : " << n << " OpenMP threads" << std::endl; // Added for debugging
     }
     else
     {
         omp_set_num_threads(n);
+        std::cout << "Using : " << n << " OpenMP threads" << std::endl; // Added for debugging
     }
 #else
     if (n > 0) 

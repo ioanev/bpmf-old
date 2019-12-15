@@ -3,83 +3,52 @@
  * All rights reserved.
  */
 
+
 #include <mpi.h>
 #include "argo.hpp"
 
-///////////////////////////////////////
-#define NNODES 4
-
-#define BPMF_NUMOVIES 2100192UL
-#define BPMF_NUMUSERS 2215888UL
-///////////////////////////////////////
-
 #define SYS ARGO_Sys
 
-/*
-void Sys::Init(const unsigned long long& init_num_latent, const unsigned long long& init_num_users, const unsigned long long& init_num_movies)
-{   
-    unsigned long long init_sum        =    sizeof(double) * init_num_latent * init_num_movies                   +  // items_ptr
-                                            sizeof(double) * init_num_latent * init_num_users                    +  // >>
-                                            sizeof(double) * init_num_latent * NNODES                            +  // sum_ptr
-                                            sizeof(double) * init_num_latent * NNODES                            +  // >>
-                                            sizeof(double) * init_num_latent * init_num_latent * NNODES          +  // cov_ptr
-                                            sizeof(double) * init_num_latent * init_num_latent * NNODES          +  // >>
-                                            sizeof(double) * NNODES                                              +  // norm_ptr
-                                            sizeof(double) * NNODES;                                                // >>
 
-    init_sum += (Sys::odirname.size()) ?    sizeof(double) * init_num_latent * init_num_movies                   +  // aggrMu_ptr
-                                            sizeof(double) * init_num_latent * init_num_users                    +  // >>
-                                            sizeof(double) * init_num_latent * init_num_latent * init_num_movies +  // aggrLambda_ptr
-                                            sizeof(double) * init_num_latent * init_num_latent * init_num_users     // >>
-                                       :    0;
-
-    //init_sum += (Sys::odirname.size()) ?    2 * 4 * 1024ULL
-    //                                   :    10 * 1024 * 1024 * 1024UL; //100 * 4 * 1024ULL;
-
-    init_sum += (1503472 * init_sum) / 62644672;
-
-    assert(init_sum < 23622320128 * NNODES);
-    
-    argo::init(init_sum);
-    
-    Sys::procid = argo::node_id();
-    Sys::nprocs = argo::number_of_nodes();
-
-    std::cout << "Allocated size is : " << init_sum << ", process : " << Sys::procid << " out of " << Sys::nprocs << std::endl;
-}
-*/
-
-void Sys::Init()
+void Sys::Init(const std::size_t& nnodes, const std::size_t& nusers, const std::size_t& nmovies)
 {
-    std::size_t init_glmem               =    sizeof(double) * BPMF_NUMLATENT * BPMF_NUMOVIES                  +  // items_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMUSERS                  +  // >>
-                                              sizeof(double) * BPMF_NUMLATENT * NNODES                         +  // sum_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * NNODES                         +  // >>
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * NNODES        +  // cov_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * NNODES        +  // >>
-                                              sizeof(double) * NNODES                                          +  // norm_ptr
-                                              sizeof(double) * NNODES;                                            // >>
+    std::size_t init_glmem               =    sizeof(double) * BPMF_NUMLATENT * nmovies                     +   // items_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * nusers                      +   // >>
+                                              sizeof(double) * BPMF_NUMLATENT * nnodes                      +   // sum_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * nnodes                      +   // >>
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nnodes     +   // cov_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nnodes     +   // >>
+                                              sizeof(double) * nnodes                                       +   // norm_ptr
+                                              sizeof(double) * nnodes;                                          // >>
 
-    init_glmem += (Sys::odirname.size()) ?    sizeof(double) * BPMF_NUMLATENT * BPMF_NUMOVIES                  +  // aggrMu_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMUSERS                  +  // >>
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * BPMF_NUMOVIES +  // aggrLambda_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * BPMF_NUMUSERS    // >>
+    init_glmem += (Sys::odirname.size()) ?    sizeof(double) * BPMF_NUMLATENT * nmovies                     +   // aggrMu_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * nusers                      +   // >>
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nmovies    +   // aggrLambda_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nusers         // >>
                                          :    0;
 
-    init_glmem += (Sys::odirname.size()) ?     2 * 4 * 1024ULL
-                                         :    12 * 4 * 1024ULL;
+    init_glmem += (Sys::odirname.size()) ?    8 * 4 * 1024UL    // something bigger
+                                         :    8 * 4 * 1024UL;   // something smaller
 
     std::size_t init_cache = init_glmem;
 
-    assert(init_glmem < 23622320128 * NNODES);
+    assert(init_glmem < 23622320128UL  * nnodes); // for Jason
+    assert(init_glmem < 135291469824UL * nnodes); // for Rackham
     
     argo::init(init_glmem, init_cache);
 
     Sys::procid = argo::node_id();
     Sys::nprocs = argo::number_of_nodes();
 
-    std::cout << "Allocated size is : " << init_glmem << ", process : " << Sys::procid << " out of " << Sys::nprocs << std::endl;
+    std::cout << "Alloc is : "  << init_glmem  <<
+                 ", nnodes : "  << nnodes      <<
+                 ", nusers : "  << nusers      <<
+                 ", nmovies : " << nmovies     <<
+                 ", procid : "  << Sys::procid <<
+                 ", out of : "  << Sys::nprocs << 
+    std::endl;
 }
+
 
 void Sys::Finalize()
 {
@@ -89,15 +58,18 @@ void Sys::Finalize()
     argo::finalize();
 }
 
+
 void Sys::sync()
 {
     argo::barrier();
 }
 
+
 void Sys::Abort(int err)
 {
     MPI_Abort(MPI_COMM_WORLD, err);
 }
+
 
 struct ARGO_Sys : public Sys
 {
@@ -115,6 +87,7 @@ struct ARGO_Sys : public Sys
     void argo_bcast();
 };
 
+
 ARGO_Sys::~ARGO_Sys()
 {
     argo::codelete_array(items_ptr);
@@ -128,9 +101,12 @@ ARGO_Sys::~ARGO_Sys()
     }
 }
 
+
 void ARGO_Sys::alloc_and_init()
 {
+    // #############################################################
     // Movies : M x K (V matrix) | Users : N x K (U matrix)
+    // #############################################################
     sum_ptr   = argo::conew_array<double>(num_latent * ARGO_Sys::nprocs);
     cov_ptr   = argo::conew_array<double>(num_latent * num_latent * ARGO_Sys::nprocs);
     norm_ptr  = argo::conew_array<double>(ARGO_Sys::nprocs);
@@ -144,9 +120,9 @@ void ARGO_Sys::alloc_and_init()
     { BPMF_COUNTER("init"); init(); }
 }
 
+
 void ARGO_Sys::argo_bcast()
 {
-    // Take note, waste for NNODES 1
 #pragma omp parallel for schedule(guided)
     for (int i = from(); i < to(); ++i)
     {
@@ -160,12 +136,14 @@ void ARGO_Sys::argo_bcast()
     { BPMF_COUNTER("sync_2");  Sys::sync();     }
 }
 
+
 void ARGO_Sys::sample(Sys &in)
 {
     { BPMF_COUNTER("compute"); Sys::sample(in); }
     
     { BPMF_COUNTER("sync_1");  Sys::sync();     }
 }
+
 
 void ARGO_Sys::sample_hp()
 {
