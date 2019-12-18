@@ -202,6 +202,14 @@ int main(int argc, char *argv[])
         movies.assign(users);
         users.assign(movies);
 
+        // #########################################################
+        // If ARGO is defined init to zero the allocated arrays
+        // #########################################################
+        #ifdef BPMF_ARGO_COMM
+            movies.init_after();
+            users.init_after();
+        #endif
+
         /*
         // #########################################################
         // Change from() and to() based on movies and users size
