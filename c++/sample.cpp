@@ -189,25 +189,35 @@ void Sys::init()
         // #########################################################
         // Each process initializes it's own chunk (by size) to 0
         // #########################################################
-        std::size_t chunk = num() / Sys::nprocs;
-        std::size_t data_begin = Sys::procid * chunk;
-        std::size_t data_end = (Sys::procid != Sys::nprocs - 1) ? data_begin + chunk : num();
+        const VectorNd zero = VectorNd::Zero();
 
-        for (std::size_t i = 0; i < data_end; ++i)
-            items().col(i) = Eigen::MatrixXd::Zero(num_latent, 1);
+        // -----------------------------------------------------
+        norm(Sys::procid) = 0;
+        // -----------------------------------------------------
 
-        chunk = (Sys::nprocs * num_latent) / Sys::nprocs;
+        // -----------------------------------------------------
+        sum_map().col(Sys::procid) = zero;
+        // -----------------------------------------------------
+
+        // -----------------------------------------------------
+        int chunk = num_latent;
+        int data_begin = Sys::procid * chunk;
+        int data_end = (Sys::procid != Sys::nprocs - 1) ? data_begin + chunk : Sys::nprocs * num_latent;
+
+        for (int i = data_begin; i < data_end; ++i)
+            cov_map().col(i) = zero;
+        // -----------------------------------------------------
+
+        // -----------------------------------------------------
+        chunk = num() / Sys::nprocs;
         data_begin = Sys::procid * chunk;
-        data_end = (Sys::procid != Sys::nprocs - 1) ? data_begin + chunk : Sys::nprocs * num_latent;
+        data_end = (Sys::procid != Sys::nprocs - 1) ? data_begin + chunk : num();
 
-        // std::cout << "Process " << Sys::procid << " from " << data_begin << " to " << data_end << std::endl;
+        for (int i = data_begin; i < data_end; ++i)
+            items().col(i) = zero;
+        // -----------------------------------------------------
 
-        for (std::size_t i = 0; i < data_end; ++i)
-            cov_map().col(i) = Eigen::MatrixXd::Zero(num_latent, 1);
-
-        sum_map().col(Sys::procid) = Eigen::MatrixXd::Zero(num_latent, 1);
-
-        norm_ptr[Sys::procid] = 0;
+        Sys::sync(); // Added for debugging
         */
 
         /*
