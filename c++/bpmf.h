@@ -104,8 +104,14 @@ struct Sys {
     static double alpha;
     static std::string odirname;
 
+    // #############################################################
+    // These settings are just for ARGO
+    // #############################################################
+    static std::size_t nusers;
+    static std::size_t nmovies;
+
     static void Init();
-    static void Init(const std::size_t&, const std::size_t&, const std::size_t&);
+    static void Init(const std::size_t&);
     static void Finalize();
     static void Abort(int);
     static void sync();

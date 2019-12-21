@@ -34,6 +34,12 @@ bool Sys::verbose = false;
 
 unsigned Sys::grain_size;
 
+// #################################################################
+// These settings are just for ARGO
+// #################################################################
+std::size_t Sys::nusers;
+std::size_t Sys::nmovies;
+
 void calc_upper_part(MatrixNNd &m, VectorNd v);         // function for calcutation of an upper part of a symmetric matrix: m = v * v.transpose(); 
 void copy_lower_part(MatrixNNd &m);                     // function to copy an upper part of a symmetric matrix to a lower part
 
@@ -122,6 +128,11 @@ Sys::Sys(std::string name, std::string fname, std::string probename)
     assert(M.rows() == Pavg.rows());
     assert(M.cols() == Pavg.cols());
     assert(Sys::nprocs <= (int)Sys::max_procs);
+
+    #ifdef BPMF_ARGO_COMM
+        THROWERROR_ASSERT(rows == (int)Sys::nusers);
+        THROWERROR_ASSERT(cols == (int)Sys::nmovies);
+    #endif
 }
 
 

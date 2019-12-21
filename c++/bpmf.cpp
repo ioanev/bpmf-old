@@ -101,9 +101,9 @@ int main(int argc, char *argv[])
     // #############################################################
     // These settings are just for ARGO
     // #############################################################
-    std::size_t nnodes  = 1;
-    std::size_t nusers  = 0;
-    std::size_t nmovies = 0;
+    Sys::nusers  = 0;
+    Sys::nmovies = 0;
+    std::size_t nnodes = 1;
 
     // #############################################################
     // Movies the parsing of cmd arguments here because of ARGO init
@@ -112,35 +112,35 @@ int main(int argc, char *argv[])
     {
         switch(ch)
         {
-            case 'i': Sys::nsims = atoi(optarg); break;             // Number of total iterations
-            case 'b': Sys::burnin = atoi(optarg); break;            // Number of burnin iterations
-            case 'f': Sys::update_freq = atoi(optarg); break;       // ...
-            case 'g': Sys::grain_size = atoi(optarg); break;        // ...
-            case 't': nthrds = atoi(optarg); break;                 // Number of threads to use
-            case 'a': Sys::alpha = atof(optarg); break;             // Noise precision (alpha)
-            case 'd': assert(num_latent == atoi(optarg)); break;    // ...
-            case 'n': fname = optarg; break;                        // Train input data
-            case 'p': probename = optarg; break;                    // Test input data
+            case 'i': Sys::nsims = atoi(optarg); break;                 // Number of total iterations
+            case 'b': Sys::burnin = atoi(optarg); break;                // Number of burnin iterations
+            case 'f': Sys::update_freq = atoi(optarg); break;           // ...
+            case 'g': Sys::grain_size = atoi(optarg); break;            // ...
+            case 't': nthrds = atoi(optarg); break;                     // Number of threads to use
+            case 'a': Sys::alpha = atof(optarg); break;                 // Noise precision (alpha)
+            case 'd': assert(num_latent == atoi(optarg)); break;        // ...
+            case 'n': fname = optarg; break;                            // Train input data
+            case 'p': probename = optarg; break;                        // Test input data
 
-            case 'o': Sys::odirname = optarg; break;                // Output directory for model and predictions
+            case 'o': Sys::odirname = optarg; break;                    // Output directory for model and predictions
 
-            case 'm': mname = optarg; break;                        // ...
-            case 'l': lname = optarg; break;                        // ...
+            case 'm': mname = optarg; break;                            // ...
+            case 'l': lname = optarg; break;                            // ...
 
-            case 'r': redirect = true; break;                       // Redirect stdout to file
-            case 'k': Sys::permute = false; break;                  // ...
-            case 'v': Sys::verbose = true; break;                   // ...
+            case 'r': redirect = true; break;                           // Redirect stdout to file
+            case 'k': Sys::permute = false; break;                      // ...
+            case 'v': Sys::verbose = true; break;                       // ...
 
             // #####################################################
             // These settings are just for ARGO
             // #####################################################
-            case 'c': nnodes  = strtoul(optarg, NULL, 0); break;    // Number of nodes to use
-            case 'e': nusers  = strtoul(optarg, NULL, 0); break;    // Number of users in dataset
-            case 'q': nmovies = strtoul(optarg, NULL, 0); break;    // Number of movies in dataset
+            case 'c': nnodes       = strtoul(optarg, NULL, 0); break;   // Number of nodes to use
+            case 'e': Sys::nusers  = strtoul(optarg, NULL, 0); break;   // Number of users in dataset
+            case 'q': Sys::nmovies = strtoul(optarg, NULL, 0); break;   // Number of movies in dataset
 
-            case '?':                                               // ...
-            case 'h':                                               // ...
-            default : usage(); Sys::Abort(1);                       // Print --help and abort
+            case '?':                                                   // ...
+            case 'h':                                                   // ...
+            default : usage(); Sys::Abort(1);                           // Print --help and abort
         }
     }
 
@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
     // If ARGO is defined init here
     // #############################################################
     #ifdef BPMF_ARGO_COMM
-        Sys::Init(nnodes, nusers, nmovies);
+        Sys::Init(nnodes);
     #endif
 
     {
@@ -210,32 +210,8 @@ int main(int argc, char *argv[])
             users.init_after();
         #endif
 
-        /*
-        // #########################################################
-        // Change from() and to() based on movies and users size
-        // Can do this in the ARGO implementation because of the
-        // sync(), since all elements are sent
-        // #########################################################
-        #ifdef BPMF_ARGO_NO_COMM
-            std::size_t movies_chunk = movies.num() / Sys::nprocs;
-            std::size_t users_chunk = users.num() / Sys::nprocs;
-            std::size_t data_begin;
-
-            for (std::size_t i = 0; i < Sys::nprocs; ++i) {
-                data_begin = i * movies_chunk;
-                movies.dom[i] = data_begin;
-                
-                data_begin = i * users_chunk;
-                users.dom[i] = data_begin;
-            }
-            
-            movies.dom[Sys::nprocs] = movies.num();
-            users.dom[Sys::nprocs] = users.num();
-        #endif
-        */
-
-        //std::cout << "(MOV) Process " << Sys::procid << " from " << movies.from() << " to " << movies.to() << std::endl;
-        //std::cout << "(USR) Process " << Sys::procid << " from " << users.from()  << " to " << users.to()  << std::endl;
+        std::cout << "(MOV) Process " << Sys::procid << " from " << movies.from() << " to " << movies.to() << std::endl;
+        std::cout << "(USR) Process " << Sys::procid << " from " << users.from()  << " to " << users.to()  << std::endl;
 
         // #########################################################
         // Build connectivity matrix
@@ -259,13 +235,13 @@ int main(int argc, char *argv[])
 
         if(Sys::procid == 0)
         {
-            Sys::cout() << "num_latent: " << num_latent<<endl;
-            Sys::cout() << "nprocs: "     << Sys::nprocs << endl;
+            Sys::cout() << "num_latent: " << num_latent                 << endl;
+            Sys::cout() << "nprocs: "     << Sys::nprocs                << endl;
             Sys::cout() << "nthrds: "     << threads::get_max_threads() << endl;
-            Sys::cout() << "nsims: "      << Sys::nsims << endl;
-            Sys::cout() << "burnin: "     << Sys::burnin << endl;
-            Sys::cout() << "grain_size: " << Sys::grain_size << endl;
-            Sys::cout() << "alpha: "      << Sys::alpha << endl;
+            Sys::cout() << "nsims: "      << Sys::nsims                 << endl;
+            Sys::cout() << "burnin: "     << Sys::burnin                << endl;
+            Sys::cout() << "grain_size: " << Sys::grain_size            << endl;
+            Sys::cout() << "alpha: "      << Sys::alpha                 << endl;
         }
 
         Sys::sync();
@@ -416,12 +392,12 @@ int main(int argc, char *argv[])
         auto elapsed_api  = end_api - begin_api;
     
         if (Sys::procid == 0) {
-            Sys::cout() << "Total API: "           << elapsed_api                       <<endl <<flush;
-            Sys::cout() << "Total WORK: "          << elapsed_work                      <<endl <<flush;
-            Sys::cout() << "Total BPMF: "          << elapsed                           <<endl <<flush;
-            Sys::cout() << "Final Avg RMSE: "      << movies.rmse_avg                   <<endl <<flush;
-            Sys::cout() << "Average items/sec: "   << average_items_sec / movies.iter   <<endl <<flush;
-            Sys::cout() << "Average ratings/sec: " << average_ratings_sec / movies.iter <<endl <<flush;
+            Sys::cout() << "Total API: "           << elapsed_api                       << endl << flush;
+            Sys::cout() << "Total WORK: "          << elapsed_work                      << endl << flush;
+            Sys::cout() << "Total BPMF: "          << elapsed                           << endl << flush;
+            Sys::cout() << "Final Avg RMSE: "      << movies.rmse_avg                   << endl << flush;
+            Sys::cout() << "Average items/sec: "   << average_items_sec / movies.iter   << endl << flush;
+            Sys::cout() << "Average ratings/sec: " << average_ratings_sec / movies.iter << endl << flush;
         }
     }
 

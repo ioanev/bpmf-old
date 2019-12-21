@@ -5,47 +5,50 @@
 
 
 #include <mpi.h>
+#include "error.h"
 #include "argo.hpp"
 
 #define SYS ARGO_Sys
 
 
-void Sys::Init(const std::size_t& nnodes, const std::size_t& nusers, const std::size_t& nmovies)
+void Sys::Init(const std::size_t& nnodes)
 {
-    std::size_t init_glmem               =    sizeof(double) * nnodes                                       +   // norm_ptr
-                                              sizeof(double) * nnodes                                       +   // >>
-                                              sizeof(double) * BPMF_NUMLATENT * nnodes                      +   // sum_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * nnodes                      +   // >>
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nnodes     +   // cov_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nnodes     +   // >>
-                                              sizeof(double) * BPMF_NUMLATENT * nmovies                     +   // items_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * nusers;                         // >>
+    std::size_t init_glmem               =    sizeof(double) * nnodes                                            +   // norm_ptr
+                                              sizeof(double) * nnodes                                            +   // >>
+                                              sizeof(double) * BPMF_NUMLATENT * nnodes                           +   // sum_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * nnodes                           +   // >>
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nnodes          +   // cov_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nnodes          +   // >>
+                                              sizeof(double) * BPMF_NUMLATENT * Sys::nmovies                     +   // items_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * Sys::nusers;                         // >>
 
-    init_glmem += (Sys::odirname.size()) ?    sizeof(double) * BPMF_NUMLATENT * nmovies                     +   // aggrMu_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * nusers                      +   // >>
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nmovies    +   // aggrLambda_ptr
-                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * nusers         // >>
+    init_glmem += (Sys::odirname.size()) ?    sizeof(double) * BPMF_NUMLATENT * Sys::nmovies                     +   // aggrMu_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * Sys::nusers                      +   // >>
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * Sys::nmovies    +   // aggrLambda_ptr
+                                              sizeof(double) * BPMF_NUMLATENT * BPMF_NUMLATENT * Sys::nusers         // >>
                                          :    0;
 
-    init_glmem += (Sys::odirname.size()) ?    8 * 4 * 1024UL    // something bigger
-                                         :    8 * 4 * 1024UL;   // something smaller
+    init_glmem += (Sys::odirname.size()) ?    8 * 4 * 1024UL                // something bigger
+                                         :    8 * 4 * 1024UL;               // something smaller
 
-    std::size_t init_cache = init_glmem;
+    const std::size_t init_cache = init_glmem;
 
-    assert(init_glmem <  22 * 1024 * 1024 * 1024UL * nnodes);   // for Jason
-    assert(init_glmem < 126 * 1024 * 1024 * 1024UL * nnodes);   // for Rackham
+    THROWERROR_ASSERT(init_glmem <  22 * 1024 * 1024 * 1024UL * nnodes);    // for Jason
+    THROWERROR_ASSERT(init_glmem < 126 * 1024 * 1024 * 1024UL * nnodes);    // for Rackham
     
     argo::init(init_glmem, init_cache);
 
     Sys::procid = argo::node_id();
     Sys::nprocs = argo::number_of_nodes();
 
-    std::cout << "Alloc is : "  << init_glmem  <<
-                 ", nnodes : "  << nnodes      <<
-                 ", nusers : "  << nusers      <<
-                 ", nmovies : " << nmovies     <<
-                 ", procid : "  << Sys::procid <<
-                 ", out of : "  << Sys::nprocs << 
+    THROWERROR_ASSERT((int)nnodes == Sys::nprocs);
+
+    std::cout << "Alloc is : "  << init_glmem   <<
+                 ", nnodes : "  << nnodes       <<
+                 ", nusers : "  << Sys::nusers  <<
+                 ", nmovies : " << Sys::nmovies <<
+                 ", procid : "  << Sys::procid  <<
+                 ", out of : "  << Sys::nprocs  << 
     std::endl;
 }
 
