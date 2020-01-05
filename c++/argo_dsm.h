@@ -159,7 +159,7 @@ void ARGO_Sys::init_after()
             items().col(i) = zero;
         // -----------------------------------------------------
 
-        Sys::sync(); // Added for debugging
+        //Sys::sync(); // Added for debugging
     }
 }
 
